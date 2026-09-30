@@ -1,27 +1,35 @@
+// Reveal elements with the .reveal class as they enter the viewport.
+// A MutationObserver picks up elements rendered later (e.g. filtered lists).
 export const observeIntersection = () => {
   const observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('animate-slide-up');
-          entry.target.classList.remove('opacity-0');
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
         }
       });
     },
     {
       threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
+      rootMargin: '0px 0px -40px 0px'
     }
   );
 
-  // Observe all elements with the animate-on-scroll class
-  const elements = document.querySelectorAll('.animate-on-scroll');
-  elements.forEach((element) => {
-    element.classList.add('opacity-0');
-    observer.observe(element);
-  });
+  const scan = () => {
+    document.querySelectorAll('.reveal:not(.is-visible)').forEach((element) => {
+      observer.observe(element);
+    });
+  };
 
-  return observer;
+  scan();
+  const mutationObserver = new MutationObserver(scan);
+  mutationObserver.observe(document.body, { childList: true, subtree: true });
+
+  return () => {
+    observer.disconnect();
+    mutationObserver.disconnect();
+  };
 };
 
 // Smooth scrolling utility
@@ -35,59 +43,24 @@ export const smoothScrollTo = (target: string) => {
   }
 };
 
-// Lazy loading for images
-export const lazyLoadImages = () => {
-  const images = document.querySelectorAll('img[data-src]');
-  const imageObserver = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        const img = entry.target as HTMLImageElement;
-        img.src = img.dataset.src!;
-        img.classList.remove('opacity-0');
-        img.classList.add('opacity-100');
-        imageObserver.unobserve(img);
-      }
-    });
-  });
+// Animate a number from 0 to target, calling onUpdate on every frame
+export const animateCounter = (
+  target: number,
+  onUpdate: (value: number) => void,
+  duration = 1600
+) => {
+  const start = performance.now();
+  let frame = 0;
 
-  images.forEach((img) => imageObserver.observe(img));
-};
-
-// Parallax effect for hero section
-export const initParallax = () => {
-  const handleScroll = () => {
-    const scrolled = window.pageYOffset;
-    const parallaxElements = document.querySelectorAll('.parallax');
-    
-    parallaxElements.forEach((element) => {
-      const speed = 0.5;
-      const yPos = -(scrolled * speed);
-      (element as HTMLElement).style.transform = `translateY(${yPos}px)`;
-    });
+  const tick = (now: number) => {
+    const progress = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    onUpdate(Math.round(target * eased));
+    if (progress < 1) {
+      frame = requestAnimationFrame(tick);
+    }
   };
 
-  window.addEventListener('scroll', handleScroll);
-  return () => window.removeEventListener('scroll', handleScroll);
-};
-
-// Animate counters
-export const animateCounters = () => {
-  const counters = document.querySelectorAll('.counter');
-  const speed = 200;
-
-  counters.forEach((counter) => {
-    const target = parseInt(counter.getAttribute('data-target') || '0');
-    const increment = target / speed;
-    let current = 0;
-
-    const timer = setInterval(() => {
-      current += increment;
-      if (current >= target) {
-        counter.textContent = target.toString();
-        clearInterval(timer);
-      } else {
-        counter.textContent = Math.ceil(current).toString();
-      }
-    }, 1);
-  });
+  frame = requestAnimationFrame(tick);
+  return () => cancelAnimationFrame(frame);
 };

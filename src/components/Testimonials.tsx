@@ -1,234 +1,133 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Star, Quote, ChevronLeft, ChevronRight } from 'lucide-react';
+import { testimonials } from '../data/content';
+import SectionHeader from './ui/SectionHeader';
 
 const Testimonials = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
-  const testimonials = [
-    {
-      id: 1,
-      name: 'Marie Dubois',
-      role: 'Propriétaire',
-      company: 'Résidence Les Jardins',
-      content: 'ConstructPro a réalisé la construction de ma maison avec un professionnalisme remarquable. Respect des délais, qualité irréprochable et équipe très à l\'écoute. Je recommande vivement !',
-      content: 'New Amza a réalisé la construction de ma maison avec un professionnalisme remarquable. Respect des délais, qualité irréprochable et équipe très à l\'écoute. Je recommande vivement !',
-      rating: 5,
-      image: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
-    },
-    {
-      id: 2,
-      name: 'Pierre Martin',
-      role: 'Directeur',
-      company: 'Entreprise Martin & Fils',
-      content: 'Partenaire fiable depuis 5 ans, New Amza nous fournit des matériaux de qualité et assure un service impeccable. Leur expertise technique est un véritable atout pour nos projets.',
-      rating: 5,
-      image: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
-    },
-    {
-      id: 3,
-      name: 'Sophie Lefebvre',
-      role: 'Architecte',
-      company: 'Cabinet d\'Architecture Moderne',
-      content: 'La collaboration avec New Amza est toujours un plaisir. Leur compréhension des enjeux architecturaux et leur capacité d\'adaptation font d\'eux des partenaires de choix.',
-      rating: 5,
-      image: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
-    },
-    {
-      id: 4,
-      name: 'Jean-Luc Moreau',
-      role: 'Gestionnaire',
-      company: 'Copropriété Horizon',
-      content: 'Pour la maintenance de notre copropriété, New Amza assure un service réactif et de qualité. Interventions rapides et tarifs compétitifs, que demander de plus ?',
-      rating: 5,
-      image: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
-    },
-    {
-      id: 5,
-      name: 'Amélie Rousseau',
-      role: 'Promoteur',
-      company: 'Immobilier Développement',
-      content: 'Un partenaire de confiance qui nous accompagne sur tous nos projets de promotion immobilière. Qualité, respect des délais et prix maîtrisés sont au rendez-vous.',
-      rating: 5,
-      image: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150&h=150&fit=crop'
-    }
-  ];
-
-  const nextTestimonial = () => {
+  const nextTestimonial = useCallback(() => {
     setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-  };
+  }, []);
 
   const prevTestimonial = () => {
     setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
   };
 
-  // Auto-play slider
+  // Auto-play slider, paused on hover / focus
   useEffect(() => {
-    const interval = setInterval(nextTestimonial, 5000);
+    if (isPaused) return;
+    const interval = setInterval(nextTestimonial, 6000);
     return () => clearInterval(interval);
-  }, []);
+  }, [isPaused, nextTestimonial]);
 
-  const renderStars = (rating: number) => {
-    return [...Array(5)].map((_, index) => (
-      <Star
-        key={index}
-        size={20}
-        className={index < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}
-      />
-    ));
-  };
+  // Three cards visible on desktop, starting at the current one
+  const visible = [0, 1, 2].map((offset) => testimonials[(currentTestimonial + offset) % testimonials.length]);
 
   return (
-    <section className="py-20 bg-light">
-      <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
-          {/* Section Header */}
-          <div className="text-center mb-16 animate-on-scroll">
-            <h2 className="text-4xl md:text-5xl font-serif font-bold text-accent mb-4">
-              Témoignages Clients
-            </h2>
-            <p className="text-xl text-secondary max-w-3xl mx-auto">
-              Découvrez ce que nos clients pensent de nos services et de notre expertise
-            </p>
-          </div>
-
-          {/* Main Testimonial */}
-          <div className="relative mb-12 animate-on-scroll">
-            <div className="bg-white rounded-lg shadow-2xl p-8 md:p-12 max-w-4xl mx-auto">
-              <div className="flex items-center justify-center mb-8">
-                <Quote className="text-primary" size={48} />
+    <section id="temoignages" className="section overflow-hidden bg-navy-900">
+      <div className="container-x">
+        <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
+          <SectionHeader
+            light
+            eyebrow="Témoignages clients"
+            title="Ce que nos clients disent de nous"
+            description="Particuliers, entreprises et architectes nous font confiance pour leurs projets."
+          />
+          <div className="reveal flex items-center gap-6">
+            <div className="text-white">
+              <div className="flex items-center gap-2">
+                <span className="font-display text-4xl font-extrabold">4.9</span>
+                <span className="text-slate-400">/ 5</span>
               </div>
-              
-              <blockquote className="text-xl md:text-2xl text-secondary text-center mb-8 leading-relaxed font-light">
-                "{testimonials[currentTestimonial].content}"
-              </blockquote>
-              
-              <div className="flex items-center justify-center space-x-2 mb-6">
-                {renderStars(testimonials[currentTestimonial].rating)}
+              <div className="mt-1 flex gap-0.5">
+                {[...Array(5)].map((_, index) => (
+                  <Star key={index} size={16} className="fill-brand-400 text-brand-400" />
+                ))}
               </div>
-              
-              <div className="flex items-center justify-center space-x-4">
-                <img
-                  src={testimonials[currentTestimonial].image}
-                  alt={testimonials[currentTestimonial].name}
-                  className="w-16 h-16 rounded-full object-cover"
-                  loading="lazy"
-                />
-                <div className="text-center">
-                  <div className="font-serif font-semibold text-accent text-lg">
-                    {testimonials[currentTestimonial].name}
-                  </div>
-                  <div className="text-secondary">
-                    {testimonials[currentTestimonial].role}
-                  </div>
-                  <div className="text-primary font-medium">
-                    {testimonials[currentTestimonial].company}
-                  </div>
-                </div>
-              </div>
+              <div className="mt-1 text-xs text-slate-400">Plus de 200 avis clients</div>
             </div>
-
-            {/* Navigation Arrows */}
-            <button
-              onClick={prevTestimonial}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white hover:bg-primary text-accent hover:text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
-            >
-              <ChevronLeft size={24} />
-            </button>
-            <button
-              onClick={nextTestimonial}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white hover:bg-primary text-accent hover:text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
-            >
-              <ChevronRight size={24} />
-            </button>
-          </div>
-
-          {/* Testimonial Indicators */}
-          <div className="flex justify-center space-x-3 mb-12 animate-on-scroll">
-            {testimonials.map((_, index) => (
+            <div className="flex gap-2">
               <button
-                key={index}
-                onClick={() => setCurrentTestimonial(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-200 ${
-                  index === currentTestimonial
-                    ? 'bg-primary scale-125'
-                    : 'bg-gray-300 hover:bg-gray-400'
-                }`}
-              />
-            ))}
-          </div>
-
-          {/* All Testimonials Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-on-scroll">
-            {testimonials.map((testimonial, index) => (
-              <div 
-                key={testimonial.id}
-                className={`bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-all duration-300 ${
-                  index === currentTestimonial ? 'ring-2 ring-primary' : ''
-                }`}
+                onClick={prevTestimonial}
+                aria-label="Témoignage précédent"
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 text-white transition-colors hover:border-brand-500 hover:bg-brand-500 hover:text-navy-900"
               >
-                <div className="flex items-center space-x-2 mb-4">
-                  {renderStars(testimonial.rating)}
-                </div>
-                
-                <p className="text-secondary mb-4 line-clamp-3">
-                  "{testimonial.content}"
-                </p>
-                
-                <div className="flex items-center space-x-3">
-                  <img
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    className="w-12 h-12 rounded-full object-cover"
-                    loading="lazy"
-                  />
-                  <div>
-                    <div className="font-serif font-semibold text-accent">
-                      {testimonial.name}
-                    </div>
-                    <div className="text-sm text-secondary">
-                      {testimonial.role}
-                    </div>
-                    <div className="text-sm text-primary font-medium">
-                      {testimonial.company}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Trust Indicators */}
-          <div className="text-center mt-16 animate-on-scroll">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-              <div className="flex items-center justify-center space-x-3">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                  <Star className="text-primary" size={24} />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-accent">4.9/5</div>
-                  <div className="text-sm text-secondary">Note moyenne</div>
-                </div>
-              </div>
-              <div className="flex items-center justify-center space-x-3">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                  <Quote className="text-primary" size={24} />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-accent">200+</div>
-                  <div className="text-sm text-secondary">Avis clients</div>
-                </div>
-              </div>
-              <div className="flex items-center justify-center space-x-3">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                  <Star className="text-primary" size={24} />
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-accent">98%</div>
-                  <div className="text-sm text-secondary">Recommandations</div>
-                </div>
-              </div>
+                <ChevronLeft size={22} />
+              </button>
+              <button
+                onClick={nextTestimonial}
+                aria-label="Témoignage suivant"
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 text-white transition-colors hover:border-brand-500 hover:bg-brand-500 hover:text-navy-900"
+              >
+                <ChevronRight size={22} />
+              </button>
             </div>
           </div>
+        </div>
+
+        <div
+          className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onFocus={() => setIsPaused(true)}
+          onBlur={() => setIsPaused(false)}
+          aria-live="polite"
+        >
+          {visible.map((testimonial, index) => (
+            <figure
+              key={`${testimonial.id}-${currentTestimonial}`}
+              className={`flex flex-col rounded-xl bg-white p-8 ${
+                index === 1 ? 'hidden md:flex' : index === 2 ? 'hidden lg:flex' : ''
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex gap-0.5" aria-label={`Note : ${testimonial.rating} sur 5`}>
+                  {[...Array(5)].map((_, starIndex) => (
+                    <Star
+                      key={starIndex}
+                      size={18}
+                      className={starIndex < testimonial.rating ? 'fill-brand-500 text-brand-500' : 'text-slate-300'}
+                    />
+                  ))}
+                </div>
+                <Quote size={36} className="text-navy-100" />
+              </div>
+
+              <blockquote className="mt-6 flex-1 leading-relaxed text-slate-700">« {testimonial.content} »</blockquote>
+
+              <figcaption className="mt-8 flex items-center gap-4 border-t border-slate-100 pt-6">
+                <span
+                  aria-hidden="true"
+                  className="flex h-12 w-12 items-center justify-center rounded-full bg-navy-800 font-display font-bold text-brand-400"
+                >
+                  {testimonial.name.charAt(0)}
+                </span>
+                <div>
+                  <div className="font-display font-bold text-ink">{testimonial.name}</div>
+                  <div className="text-sm text-slate-500">
+                    {testimonial.role} · {testimonial.company}
+                  </div>
+                </div>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+
+        {/* Indicators */}
+        <div className="mt-10 flex justify-center gap-2">
+          {testimonials.map((testimonial, index) => (
+            <button
+              key={testimonial.id}
+              onClick={() => setCurrentTestimonial(index)}
+              aria-label={`Afficher le témoignage de ${testimonial.name}`}
+              aria-current={index === currentTestimonial}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                index === currentTestimonial ? 'w-8 bg-brand-500' : 'w-4 bg-white/25 hover:bg-white/50'
+              }`}
+            />
+          ))}
         </div>
       </div>
     </section>

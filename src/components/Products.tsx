@@ -1,189 +1,143 @@
-import React, { useState } from 'react';
-import { Filter } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, MessageSquareText, Package, Truck, type LucideIcon } from 'lucide-react';
+import { productCategories, products } from '../data/content';
+import { useQuote } from '../context/QuoteContext';
+import SectionHeader from './ui/SectionHeader';
+
+// Shown when a product has no photo yet
+const ProductIconTile = ({ icon: Icon = Package }: { icon?: LucideIcon }) => (
+  <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-br from-navy-800 to-navy-950">
+    <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-brand-500/10" />
+    <div className="absolute -bottom-16 -left-8 h-48 w-48 rounded-full bg-white/5" />
+    <Icon size={72} strokeWidth={1.25} className="relative text-brand-400 transition-transform duration-500 group-hover:scale-110" />
+  </div>
+);
 
 const Products = () => {
   const [activeFilter, setActiveFilter] = useState('tous');
+  const { requestQuote } = useQuote();
 
-  const categories = [
-    { id: 'tous', label: 'Tous les produits' },
-    { id: 'beton', label: 'Béton & Mortier' },
-    { id: 'bois', label: 'Bois & Charpente' },
-    { id: 'isolation', label: 'Isolation' },
-    { id: 'outillage', label: 'Outillage' },
-    { id: 'finition', label: 'Finition' }
-  ];
+  const filteredProducts =
+    activeFilter === 'tous' ? products : products.filter((product) => product.category === activeFilter);
 
-  const products = [
-    {
-      id: 1,
-      name: 'Béton prêt à l\'emploi',
-      category: 'beton',
-      description: 'Béton haute qualité pour tous vos projets',
-      price: 'À partir de 85€/m³',
-      image: 'https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop'
-    },
-    {
-      id: 2,
-      name: 'Mortier de façade',
-      category: 'beton',
-      description: 'Mortier résistant aux intempéries',
-      price: 'À partir de 12€/sac',
-      image: 'https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop'
-    },
-    {
-      id: 3,
-      name: 'Poutrelles en bois',
-      category: 'bois',
-      description: 'Bois massif traité pour charpentes',
-      price: 'À partir de 35€/m',
-      image: 'https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop'
-    },
-    {
-      id: 4,
-      name: 'Panneaux OSB',
-      category: 'bois',
-      description: 'Panneaux structurels multi-usage',
-      price: 'À partir de 22€/m²',
-      image: 'https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop'
-    },
-    {
-      id: 5,
-      name: 'Laine de roche',
-      category: 'isolation',
-      description: 'Isolation thermique et acoustique',
-      price: 'À partir de 8€/m²',
-      image: 'https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop'
-    },
-    {
-      id: 6,
-      name: 'Polystyrène expansé',
-      category: 'isolation',
-      description: 'Isolation thermique performante',
-      price: 'À partir de 6€/m²',
-      image: 'https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop'
-    },
-    {
-      id: 7,
-      name: 'Perceuse à percussion',
-      category: 'outillage',
-      description: 'Outillage professionnel haute performance',
-      price: 'À partir de 185€',
-      image: 'https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop'
-    },
-    {
-      id: 8,
-      name: 'Scie circulaire',
-      category: 'outillage',
-      description: 'Coupe précise pour tous matériaux',
-      price: 'À partir de 125€',
-      image: 'https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop'
-    },
-    {
-      id: 9,
-      name: 'Peinture façade',
-      category: 'finition',
-      description: 'Peinture haute résistance',
-      price: 'À partir de 28€/L',
-      image: 'https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop'
-    }
-  ];
-
-  const filteredProducts = activeFilter === 'tous' 
-    ? products 
-    : products.filter(product => product.category === activeFilter);
+  const categoryOf = (id: string) => productCategories.find((cat) => cat.id === id);
 
   return (
-    <section id="produits" className="py-20 bg-light">
-      <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
-          {/* Section Header */}
-          <div className="text-center mb-16 animate-on-scroll">
-            <h2 className="text-4xl md:text-5xl font-serif font-bold text-accent mb-4">
-              Nos Produits
-            </h2>
-            <p className="text-xl text-secondary max-w-3xl mx-auto">
-              Découvrez notre large gamme de matériaux et outils de construction 
-              sélectionnés pour leur qualité et leur durabilité
-            </p>
-          </div>
+    <section id="produits" className="section bg-surface">
+      <div className="container-x">
+        <SectionHeader
+          eyebrow="Nos produits"
+          title="Tout pour construire, équiper et sécuriser"
+          description="Matériaux de construction, sanitaire, électricité & solaire, groupes électrogènes, climatisation, anti-incendie et outillage : l'une des plus grandes quincailleries de la RD Congo."
+        />
 
-          {/* Filter Buttons */}
-          <div className="flex flex-wrap justify-center gap-4 mb-12 animate-on-scroll">
-            <div className="flex items-center space-x-2 text-secondary mb-4">
-              <Filter size={20} />
-              <span className="font-medium">Filtrer par catégorie:</span>
-            </div>
-            <div className="flex flex-wrap justify-center gap-2">
-              {categories.map((category) => (
+        {/* Filters */}
+        <div className="reveal mt-12 flex flex-col gap-4 border-b border-slate-200 sm:flex-row sm:items-center sm:justify-between">
+          <div
+            className="no-scrollbar -mx-4 flex min-w-0 gap-1 overflow-x-auto px-4 sm:mx-0 sm:px-0"
+            role="tablist"
+            aria-label="Catégories de produits"
+          >
+            {productCategories.map((category) => {
+              const isActive = activeFilter === category.id;
+              return (
                 <button
                   key={category.id}
+                  role="tab"
+                  aria-selected={isActive}
                   onClick={() => setActiveFilter(category.id)}
-                  className={`px-6 py-2 rounded-full font-medium transition-all duration-200 ${
-                    activeFilter === category.id
-                      ? 'bg-primary text-white shadow-lg'
-                      : 'bg-white text-secondary hover:bg-primary/10 hover:text-primary'
+                  className={`relative whitespace-nowrap px-4 py-3 text-sm font-semibold transition-colors ${
+                    isActive ? 'text-navy-800' : 'text-slate-500 hover:text-navy-800'
                   }`}
                 >
                   {category.label}
+                  <span
+                    className={`absolute inset-x-0 -bottom-px h-0.5 bg-brand-500 transition-transform duration-300 ${
+                      isActive ? 'scale-x-100' : 'scale-x-0'
+                    }`}
+                  />
                 </button>
-              ))}
-            </div>
+              );
+            })}
           </div>
+          <p className="hidden shrink-0 whitespace-nowrap pb-3 text-sm text-slate-500 xl:block" aria-live="polite">
+            {filteredProducts.length} produit{filteredProducts.length > 1 ? 's' : ''}
+          </p>
+        </div>
 
-          {/* Products Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProducts.map((product, index) => (
-              <div 
-                key={product.id}
-                className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 animate-on-scroll"
-                style={{ animationDelay: `${index * 0.1}s` }}
-              >
-                <div className="relative overflow-hidden">
+        {/* Products Grid */}
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {filteredProducts.map((product) => (
+            <article
+              key={product.id}
+              className="card group flex flex-col overflow-hidden animate-fade-in transition-shadow duration-300 hover:shadow-lift"
+            >
+              <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                {product.image ? (
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-48 object-cover transition-transform duration-300 hover:scale-105"
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                     loading="lazy"
                   />
-                  <div className="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    {categories.find(cat => cat.id === product.category)?.label}
+                ) : (
+                  <ProductIconTile icon={categoryOf(product.category)?.icon} />
+                )}
+                <span className="absolute left-4 top-4 rounded bg-white/95 px-2.5 py-1 text-xs font-semibold text-navy-800 shadow-sm">
+                  {categoryOf(product.category)?.label}
+                </span>
+              </div>
+
+              <div className="flex flex-1 flex-col p-6">
+                <h3 className="text-lg font-bold">{product.name}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-slate-600">{product.description}</p>
+
+                <div className="mt-auto flex items-end justify-between gap-4 border-t border-slate-100 pt-5">
+                  <div>
+                    <div className="text-xs text-slate-500">Tarif</div>
+                    <div className="font-display text-base font-bold text-navy-800">Sur demande</div>
                   </div>
-                </div>
-                
-                <div className="p-6">
-                  <h3 className="text-xl font-serif font-semibold text-accent mb-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-secondary mb-4">
-                    {product.description}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-bold text-primary">
-                      {product.price}
-                    </span>
-                    <button className="bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors duration-200">
-                      Demander un devis
-                    </button>
-                  </div>
+                  <button
+                    onClick={() =>
+                      requestQuote(
+                        'materiaux',
+                        `Bonjour, je souhaite un devis pour : ${product.name}.\nQuantité : \nLieu de livraison : `
+                      )
+                    }
+                    className="btn-dark px-4 py-2.5"
+                    aria-label={`Demander un devis pour ${product.name}`}
+                  >
+                    Devis
+                    <ArrowRight size={16} />
+                  </button>
                 </div>
               </div>
-            ))}
-          </div>
+            </article>
+          ))}
+        </div>
 
-          {/* Call to Action */}
-          <div className="text-center mt-16 animate-on-scroll">
-            <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
-              <h3 className="text-2xl font-serif font-bold text-accent mb-4">
-                Besoin d'un produit spécifique ?
-              </h3>
-              <p className="text-secondary mb-6">
-                Notre équipe est là pour vous conseiller et vous accompagner dans le choix 
-                des matériaux les plus adaptés à votre projet.
-              </p>
-              <button className="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors duration-200">
-                Contactez nos experts
-              </button>
+        {/* Call to Action */}
+        <div className="reveal mt-16 overflow-hidden rounded-xl bg-navy-800 text-white">
+          <div className="grid items-center gap-8 p-8 sm:p-10 lg:grid-cols-[1fr_auto]">
+            <div className="flex gap-5">
+              <span className="hidden h-14 w-14 shrink-0 items-center justify-center rounded-md bg-brand-500 text-navy-900 sm:flex">
+                <MessageSquareText size={26} />
+              </span>
+              <div>
+                <h3 className="text-2xl font-bold text-white">Besoin d'un produit spécifique ?</h3>
+                <p className="mt-2 max-w-2xl text-slate-300">
+                  Nos experts vous conseillent sur les matériaux les plus adaptés à votre projet.
+                </p>
+                <p className="mt-3 flex items-center gap-2 text-sm text-slate-400">
+                  <Truck size={16} className="text-brand-400" />
+                  Livraison sur chantier disponible
+                </p>
+              </div>
             </div>
+            <button onClick={() => requestQuote('materiaux')} className="btn-primary">
+              Contactez nos experts
+              <ArrowRight size={16} />
+            </button>
           </div>
         </div>
       </div>

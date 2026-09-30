@@ -1,105 +1,72 @@
-import React from 'react';
-import { Home, Package, Wrench, ArrowRight } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
+import { services } from '../data/content';
+import { useQuote } from '../context/QuoteContext';
+import SectionHeader from './ui/SectionHeader';
 
 const Services = () => {
-  const services = [
-    {
-      icon: Home,
-      title: "Construction",
-      subtitle: "Bâtiment neuf et rénovation",
-      description: "Maisons individuelles, bâtiments commerciaux, extensions et rénovations complètes. Nous gérons votre projet de A à Z avec expertise et professionnalisme.",
-      features: ["Gros œuvre", "Second œuvre", "Finitions", "Coordination métiers"],
-      image: "https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop"
-    },
-    {
-      icon: Package,
-      title: "Vente de matériaux",
-      subtitle: "Fournitures de qualité",
-      description: "Large gamme de matériaux de construction sélectionnés auprès des meilleurs fournisseurs. Conseil personnalisé et livraison sur chantier.",
-      features: ["Béton et mortier", "Bois et charpente", "Isolation", "Outillage professionnel"],
-      image: "https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop"
-    },
-    {
-      icon: Wrench,
-      title: "Maintenance",
-      subtitle: "Entretien et réparation",
-      description: "Services de maintenance préventive et curative pour préserver vos investissements. Interventions rapides et efficaces.",
-      features: ["Maintenance préventive", "Dépannage d'urgence", "Réparations", "Entretien régulier"],
-      image: "https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=800&h=600&fit=crop"
-    }
-  ];
+  const { requestQuote } = useQuote();
 
   return (
-    <section id="services" className="py-20 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
-          {/* Section Header */}
-          <div className="text-center mb-16 animate-on-scroll">
-            <h2 className="text-4xl md:text-5xl font-serif font-bold text-accent mb-4">
-              Nos Services
-            </h2>
-            <p className="text-xl text-secondary max-w-3xl mx-auto">
-              Trois pôles d'expertise pour répondre à tous vos besoins en construction, 
-              matériaux et maintenance
-            </p>
-          </div>
+    <section id="services" className="section bg-white">
+      <div className="container-x">
+        <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+          <SectionHeader
+            eyebrow="Nos services"
+            title="Trois pôles d'expertise, un seul interlocuteur"
+            description="Pour répondre à tous vos besoins en construction, matériaux et maintenance."
+          />
+          <button onClick={() => requestQuote()} className="btn-outline reveal shrink-0 self-start lg:self-auto">
+            Parler de votre projet
+            <ArrowRight size={16} />
+          </button>
+        </div>
 
-          {/* Services Grid */}
-          <div className="space-y-16">
-            {services.map((service, index) => (
-              <div 
-                key={index}
-                className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center animate-on-scroll ${
-                  index % 2 === 1 ? 'lg:grid-flow-col-dense' : ''
-                }`}
-              >
-                {/* Content */}
-                <div className={index % 2 === 1 ? 'lg:col-start-2' : ''}>
-                  <div className="flex items-center space-x-4 mb-6">
-                    <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                      <service.icon className="text-primary" size={32} />
-                    </div>
-                    <div>
-                      <h3 className="text-3xl font-serif font-bold text-accent">{service.title}</h3>
-                      <p className="text-primary font-medium">{service.subtitle}</p>
-                    </div>
-                  </div>
-                  
-                  <p className="text-lg text-secondary mb-6 leading-relaxed">
-                    {service.description}
-                  </p>
-
-                  {/* Features */}
-                  <div className="grid grid-cols-2 gap-3 mb-8">
-                    {service.features.map((feature, featureIndex) => (
-                      <div key={featureIndex} className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-primary rounded-full"></div>
-                        <span className="text-secondary">{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <button className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors duration-200 flex items-center space-x-2">
-                    <span>En savoir plus</span>
-                    <ArrowRight size={20} />
-                  </button>
+        <div className="mt-14 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {services.map((service, index) => (
+            <article
+              key={service.title}
+              className="card reveal group flex flex-col overflow-hidden transition-shadow duration-300 hover:shadow-lift"
+              style={{ transitionDelay: `${index * 80}ms` }}
+            >
+              <div className="relative">
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <img
+                    src={service.image}
+                    alt={service.title}
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy-950/60 to-transparent" />
                 </div>
-
-                {/* Image */}
-                <div className={index % 2 === 1 ? 'lg:col-start-1' : ''}>
-                  <div className="relative">
-                    <img
-                      src={service.image}
-                      alt={service.title}
-                      className="rounded-lg shadow-2xl w-full h-96 object-cover"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg"></div>
-                  </div>
-                </div>
+                <span className="absolute bottom-0 left-6 flex h-14 w-14 translate-y-1/2 items-center justify-center rounded-md bg-brand-500 text-navy-900 shadow-lg">
+                  <service.icon size={26} />
+                </span>
               </div>
-            ))}
-          </div>
+
+              <div className="flex flex-1 flex-col p-6 pt-10">
+                <p className="text-xs font-bold uppercase tracking-wider text-brand-600">{service.subtitle}</p>
+                <h3 className="mt-2 text-2xl font-bold">{service.title}</h3>
+                <p className="mt-3 leading-relaxed text-slate-600">{service.description}</p>
+
+                <ul className="mt-6 grid grid-cols-2 gap-x-4 gap-y-2.5">
+                  {service.features.map((feature) => (
+                    <li key={feature} className="flex items-center gap-2 text-sm text-slate-700">
+                      <Check size={16} className="shrink-0 text-brand-600" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+
+                <button
+                  onClick={() => requestQuote(service.subject)}
+                  className="mt-auto flex items-center gap-2 pt-8 text-sm font-semibold text-navy-800 transition-colors hover:text-brand-600"
+                >
+                  Demander un devis
+                  <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                </button>
+              </div>
+            </article>
+          ))}
         </div>
       </div>
     </section>

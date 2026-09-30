@@ -1,37 +1,43 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
+import Stats from './components/Stats';
 import About from './components/About';
 import Services from './components/Services';
 import Products from './components/Products';
 import Portfolio from './components/Portfolio';
+import Partners from './components/Partners';
 import Testimonials from './components/Testimonials';
+import CtaBanner from './components/CtaBanner';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
+import FloatingActions from './components/FloatingActions';
+import { QuoteProvider } from './context/QuoteContext';
 import { observeIntersection } from './utils/animations';
 
 function App() {
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    setIsLoaded(true);
-    observeIntersection();
-  }, []);
+  useEffect(() => observeIntersection(), []);
 
   return (
-    <div className={`min-h-screen ${isLoaded ? 'animate-fade-in' : 'opacity-0'}`}>
-      <Header />
-      <main>
-        <Hero />
-        <About />
-        <Services />
-        <Products />
-        <Portfolio />
-        <Testimonials />
-        <Contact />
-      </main>
-      <Footer />
-    </div>
+    <QuoteProvider>
+      <div className="min-h-screen animate-fade-in">
+        <Header />
+        <main>
+          <Hero />
+          <Stats />
+          <About />
+          <Services />
+          <Products />
+          <Portfolio />
+          <Partners />
+          <Testimonials />
+          <CtaBanner />
+          <Contact />
+        </main>
+        <Footer />
+        <FloatingActions />
+      </div>
+    </QuoteProvider>
   );
 }
 
